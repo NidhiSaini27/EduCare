@@ -1,0 +1,262 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>✨ Cute Doodle Canvas Playground ✨</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive;
+      background: #fff0f5;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body.dark {
+      background: #2b2b2b;
+      color: #f9f9f9;
+    }
+    h1 {
+      margin: 20px;
+      font-size: 2.5em;
+      color: #ff69b4;
+      text-shadow: 1px 1px 3px #ffa6d1;
+    }
+    .controls {
+      margin-bottom: 15px;
+    }
+    .controls input,
+    .controls button,
+    .controls select {
+      margin: 5px 6px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+    .controls input[type="color"] {
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      vertical-align: middle;
+    }
+    .controls button:hover,
+    .controls select:hover {
+      background-color: #ffb6c1;
+      color: white;
+    }
+    .canvas-wrapper {
+      position: relative;
+      display: inline-block;
+      border-radius: 10px;
+      border: 4px dashed #ffb6c1;
+      background: white;
+      box-shadow: 0 0 15px #ffb6c1;
+    }
+    body.dark .canvas-wrapper {
+      background: #444;
+      border-color: #ff69b4;
+      box-shadow: 0 0 20px #ff69b4;
+    }
+    canvas {
+      display: block;
+      border-radius: 10px;
+      cursor: crosshair;
+    }
+    #stickerLayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 800px;
+      height: 500px;
+      pointer-events: none;
+    }
+    .sticker {
+      position: absolute;
+      font-size: 40px;
+      pointer-events: auto;
+      cursor: move;
+      user-select: none;
+      user-drag: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ Cute Doodle Canvas Playground ✨</h1>
+  <div class="controls">
+    <input type="color" id="colorPicker" value="#ff69b4" />
+    <input type="range" id="brushSize" min="1" max="30" value="5" />
+    <button id="eraserBtn">🪼 Eraser</button>
+    <button id="emojiModeBtn">😊 Emoji Mode</button>
+    <select id="emojiPicker">
+      <option>🎀</option><option>🌸</option><option>🍭</option><option>🪸</option>
+      <option>🦤</option><option>💫</option><option>🐱‍🔫</option><option>🌈</option><option>✨</option>
+    </select>
+    <input type="range" id="emojiSize" min="20" max="100" value="40" />
+    <button id="clearBtn">🧹 Clear</button>
+    <button id="saveBtn">💾 Save</button>
+    <button id="darkModeBtn">🌙 Dark Mode</button>
+    <button id="musicBtn">🎵 Play Music</button>
+  </div>
+
+  <div class="canvas-wrapper" style="width: 800px; height: 500px;">
+    <canvas id="canvas" width="800" height="500"></canvas>
+    <div id="stickerLayer"></div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+    const brushSize = document.getElementById('brushSize');
+    const eraserBtn = document.getElementById('eraserBtn');
+    const emojiModeBtn = document.getElementById('emojiModeBtn');
+    const emojiPicker = document.getElementById('emojiPicker');
+    const emojiSize = document.getElementById('emojiSize');
+    const clearBtn = document.getElementById('clearBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    const musicBtn = document.getElementById('musicBtn');
+    const bgMusic = document.getElementById('bgMusic');
+    const stickerLayer = document.getElementById('stickerLayer');
+
+    let drawing = false;
+    let erasing = false;
+    let emojiMode = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    canvas.addEventListener('mousedown', e => {
+      if (emojiMode) {
+        const rect = canvas.getBoundingClientRect();
+        const emoji = emojiPicker.value;
+        const size = emojiSize.value;
+        const sticker = document.createElement('span');
+        sticker.textContent = emoji;
+        sticker.className = 'sticker';
+        sticker.style.left = `${e.clientX - rect.left - size / 2}px`;
+        sticker.style.top = `${e.clientY - rect.top - size / 2}px`;
+        sticker.style.fontSize = `${size}px`;
+        sticker.draggable = true;
+
+        sticker.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', null);
+          window.draggingSticker = sticker;
+          window.dragOffsetX = e.clientX - sticker.offsetLeft;
+          window.dragOffsetY = e.clientY - sticker.offsetTop;
+        });
+
+        document.addEventListener('dragover', e => {
+          e.preventDefault();
+          if (window.draggingSticker) {
+            const x = e.clientX - window.dragOffsetX;
+            const y = e.clientY - window.dragOffsetY;
+            window.draggingSticker.style.left = x + 'px';
+            window.draggingSticker.style.top = y + 'px';
+          }
+        });
+
+        document.addEventListener('dragend', () => {
+          window.draggingSticker = null;
+        });
+
+        sticker.addEventListener('click', () => {
+          if (confirm('Remove this sticker?')) sticker.remove();
+        });
+
+        stickerLayer.appendChild(sticker);
+      } else {
+        drawing = true;
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+      }
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (!drawing || emojiMode) return;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.strokeStyle = erasing ? '#fff0f5' : colorPicker.value;
+      ctx.lineWidth = brushSize.value;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      lastX = e.offsetX;
+      lastY = e.offsetY;
+    });
+
+    canvas.addEventListener('mouseup', () => (drawing = false));
+    canvas.addEventListener('mouseleave', () => (drawing = false));
+
+    eraserBtn.onclick = () => {
+      erasing = !erasing;
+      emojiMode = false;
+      eraserBtn.textContent = erasing ? '✏ Brush' : '🪼 Eraser';
+      emojiModeBtn.textContent = '😊 Emoji Mode';
+    };
+
+    emojiModeBtn.onclick = () => {
+      emojiMode = !emojiMode;
+      erasing = false;
+      emojiModeBtn.textContent = emojiMode ? '✏ Draw Mode' : '😊 Emoji Mode';
+      eraserBtn.textContent = '🪼 Eraser';
+    };
+
+    clearBtn.onclick = () => {
+      if (confirm('Clear canvas AND remove all stickers?')) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stickerLayer.innerHTML = '';
+      }
+    };
+
+    saveBtn.onclick = () => {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(canvas, 0, 0);
+      const stickers = stickerLayer.querySelectorAll('.sticker');
+      stickers.forEach(sticker => {
+        const fontSize = window.getComputedStyle(sticker).fontSize;
+        tempCtx.font = fontSize + ' serif';
+        const x = parseFloat(sticker.style.left);
+        const y = parseFloat(sticker.style.top) + parseFloat(fontSize);
+        tempCtx.fillText(sticker.textContent, x, y);
+      });
+      const link = document.createElement('a');
+      link.download = 'my-doodle.png';
+      link.href = tempCanvas.toDataURL();
+      link.click();
+    };
+
+    darkModeBtn.onclick = () => {
+      document.body.classList.toggle('dark');
+    };
+
+    musicBtn.onclick = () => {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicBtn.textContent = '🔇 Pause Music';
+      } else {
+        bgMusic.pause();
+        musicBtn.textContent = '🎵 Play Music';
+      }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && !bgMusic.paused) {
+        bgMusic.pause();
+        musicBtn.textContent = '🎵 Play Music';
+      }
+    });
+  </script>
+</body>
+</html>
