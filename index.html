@@ -1,0 +1,121 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EduWell | Student Wellness</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🌼 EduWell</h1>
+    <p>Your cozy student wellness space ✨</p>
+  </header>
+
+  <div class="main">
+    <nav class="sidebar">
+      <ul>
+        <li><a href="#" class="active" data-target="home">🏠 Home</a></li>
+        <li><a href="#" data-target="dashboard">📊 Dashboard</a></li>
+        <li><a href="#" data-target="mood">🌈 Mood Check-in</a></li>
+        <li><a href="#" data-target="Games">🎮 ZenZone</a></li>
+      </ul>
+    </nav>
+
+    <div class="content">
+      <!-- Home Section -->
+      <section id="home" class="section active">
+        <h2>Hi there, Sunshine! ☀</h2>
+        <p>This is your safe space to track your mood, submissions, and overall journey. Take a deep breath, you’re doing great 💖</p>
+      </section>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="section">
+        <h2>EduWell Dashboard</h2>
+        <div class="dashboard">
+
+          <!-- Risk Overview -->
+          <div class="card">
+            <h3>📊 Risk Overview</h3>
+            <canvas id="riskChart"></canvas>
+          </div>
+
+          <!-- Performance & Submission -->
+          <div class="card">
+            <h3>📈 Performance & Submissions</h3>
+            <canvas id="performanceChart"></canvas>
+          </div>
+
+          <!-- Assignment Submission Panel -->
+          <div class="card">
+            <h3>📚 Assignment Submission</h3>
+            <p id="assignmentStatusText"></p>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" id="assignmentProgressFill">0%</div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Assignment</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="assignmentTableBody">
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Anonymous Risk Table -->
+          <div class="card" style="grid-column: span 2;">
+            <h3>🙍‍♂ Anonymous Risk Table</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Risk Level</th>
+                  <th>Factors</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>ST1234</td><td>High</td><td>Low submissions, low mood</td></tr>
+                <tr><td>ST5678</td><td>Medium</td><td>Late submissions</td></tr>
+                <tr><td>ST9101</td><td>Low</td><td>Good performance</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Mood Check-in Section -->
+      <section id="mood" class="section">
+        <h2>🌈 Mood Check-in</h2>
+        <p>Select how you feel right now:</p>
+        <div class="mood-options">
+          <div class="mood-option" data-mood="Happy" title="Happy">😄</div>
+          <div class="mood-option" data-mood="Calm" title="Calm">😌</div>
+          <div class="mood-option" data-mood="Anxious" title="Anxious">😰</div>
+          <div class="mood-option" data-mood="Sad" title="Sad">😢</div>
+          <div class="mood-option" data-mood="Excited" title="Excited">🤩</div>
+          <div class="mood-option" data-mood="Tired" title="Tired">😴</div>
+        </div>
+        <p id="moodResult" style="margin-top:20px; font-size:1.2rem; font-weight:bold;"></p>
+      </section>
+
+      <!-- Reports Section -->
+      <section id="reports" class="section">
+        <h2>📄 Reports</h2>
+        <p>Coming soon! Here you'll find detailed analytics and suggestions to support your wellness journey.</p>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 EduWell — Stay bright and balanced! 🌟
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
